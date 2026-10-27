@@ -18,8 +18,12 @@ async function init() {
 
     const player = document.getElementById("vid-player");
     player.hidden = false;
+    player.autoplay = true;
     player.src = file.url;
     player.load();
+    player.play().catch(error => {
+        console.warn("Video autoplay was blocked", error);
+    });
 }
 
 function determineFileType(fileName) {
