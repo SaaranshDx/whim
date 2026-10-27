@@ -12,28 +12,24 @@ async function init() {
     });
 
     const file = await window.pywebview.api.get_file_info();
-
-    if (file) {
-        console.log(file.name);
-        console.log(file.path);
+    if (!file || determineFileType(file.name) !== "video") {
+        return;
     }
+
+    console.log(file.name);
+    console.log(file.path);
+    openVideo(file.url);
 }
 
-async function getFileMeta() {
-  try {
-    const fileMeta = await window.pywebview.api.get_file_info();
-    return [fileMeta.name, fileMeta.path];
-  } catch (error) {
-    return undefined;
-  }
+function openVideo() {
+    const player = document.getElementById("vid-player");
+
+    player.src = "http://127.0.0.1:8765/video";
+    player.style.display = "block";
+    player.load();
 }
 
-
-
-// this is for the future support for other files
-const fileMeta = getFileMeta();
-async function determineFileType(fileMeta) {
-  try {
+function determineFileType(fileName) {
     const videoExtensions = [
         ".mp4", ".m4v", ".mkv", ".webm", ".mov",
         ".avi", ".wmv", ".flv", ".f4v", ".mpeg",
@@ -43,16 +39,10 @@ async function determineFileType(fileMeta) {
         ".ivf", ".bik", ".smk", ".amv", ".mjpeg",
         ".mjpg", ".wtv", ".dvr-ms"
     ];
-    const fileName = fileMeta[0];
-    const isVideo = videoExtensions.some(ext =>
-        fileName.toLowerCase().endsWith(ext)
-    );
-    if (isVideo) {
-      return `video`;
-    }
-  } catch (error) {
-    return undefined;
-  }
+
+    return videoExtensions.some(extension =>
+        fileName.toLowerCase().endsWith(extension)
+    ) ? "video" : undefined;
 }
 
 init();
