@@ -49,6 +49,7 @@ if __name__ == "__main__":
         "public/index.html",
         width=1000,
         height=600,
+        background_color="#111318",
         js_api=api,
     )
     if window is None:

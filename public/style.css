@@ -1,9 +1,14 @@
+:root {
+  color-scheme: dark;
+}
+
 html,
 body {
   width: 100%;
   height: 100%;
   margin: 0;
   overflow: hidden;
+  background: #111318;
 }
 
 #vid-player {
@@ -11,4 +16,8 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  background: #000;
+  color-scheme: dark;
+  border: 1px solid #2b2f38;
+  box-sizing: border-box;
 }
