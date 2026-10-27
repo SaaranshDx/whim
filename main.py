@@ -13,7 +13,10 @@ file_path = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else None
 file_name = file_path.name if file_path else "whim"
 
 app = Flask(__name__)
-public_dir = Path(__file__).resolve().parent / "public"
+bundle_dir = Path(
+    getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)
+)
+public_dir = bundle_dir / "public"
 window_state_path = Path(
     os.environ.get("APPDATA", Path.home() / ".config")
 ) / "whim" / "window.json"
@@ -135,7 +138,7 @@ if __name__ == "__main__":
             + quote(file_url, safe="")
         )
     else:
-        viewer_url = "public/index.html"
+        viewer_url = str(public_dir / "index.html")
 
     window_width, window_height = load_window_size()
     window = webview.create_window(
