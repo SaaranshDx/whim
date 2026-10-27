@@ -21,11 +21,22 @@ async function init() {
     openVideo(file.url);
 }
 
-function openVideo() {
+async function openVideo() {
+    const file = await window.pywebview.api.get_file_info();
+    if (!file) return;
+
     const player = document.getElementById("vid-player");
 
-    player.src = "http://127.0.0.1:8765/video";
+    player.src = file.url;
     player.style.display = "block";
+
+    player.onloadedmetadata = async () => {
+        await window.pywebview.api.resize_for_video(
+            player.videoWidth,
+            player.videoHeight
+        );
+    };
+
     player.load();
 }
 
