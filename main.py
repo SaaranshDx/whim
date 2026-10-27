@@ -18,6 +18,7 @@ window_state_path = Path(
     os.environ.get("APPDATA", Path.home() / ".config")
 ) / "whim" / "window.json"
 window_state_lock = threading.Lock()
+app_window = None
 DEFAULT_WINDOW_SIZE = (1000, 600)
 
 
@@ -76,6 +77,10 @@ def run_server():
 
 
 class Api:
+    def toggle_fullscreen(self):
+        if app_window:
+            app_window.toggle_fullscreen()
+
     def get_file_info(self):
         if not file_path or not file_path.is_file():
             return None
@@ -111,5 +116,6 @@ if __name__ == "__main__":
     if window is None:
         raise RuntimeError("Failed to create the pywebview window")
 
+    app_window = window
     window.events.resized += save_window_size
     webview.start(debug=True)
