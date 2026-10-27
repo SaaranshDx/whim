@@ -11,6 +11,10 @@ body {
   background: #111318;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 #vid-player {
   display: block;
   width: 100%;
@@ -20,4 +24,81 @@ body {
   color-scheme: dark;
   border: 1px solid #2b2f38;
   box-sizing: border-box;
+}
+
+#pdf-viewer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #e8eaf0;
+  background: #111318;
+}
+
+#pdf-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 48px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #2b2f38;
+  background: #181b22;
+  user-select: none;
+}
+
+.pdf-page-controls,
+.pdf-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#pdf-toolbar button {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #3a404c;
+  border-radius: 6px;
+  color: #e8eaf0;
+  background: #252a33;
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#pdf-toolbar button:hover:not(:disabled) {
+  background: #323946;
+}
+
+#pdf-toolbar button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+#pdf-pages {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 24px;
+  box-sizing: border-box;
+  background: #0c0e12;
+}
+
+.pdf-page-canvas {
+  display: block;
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+}
+
+#pdf-status {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: 0;
+  color: #aeb5c2;
+  transform: translate(-50%, -50%);
 }

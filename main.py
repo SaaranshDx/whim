@@ -12,12 +12,14 @@ file_name = file_path.name if file_path else "whim"
 app = Flask(__name__)
 
 
-@app.get("/video")
-def serve_video():
+@app.get("/file")
+def serve_file():
     if not file_path or not file_path.is_file():
         abort(404)
 
-    return send_file(file_path, conditional=True)
+    response = send_file(file_path, conditional=True)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 def run_server():
@@ -37,7 +39,7 @@ class Api:
         return {
             "name": file_path.name,
             "path": str(file_path),
-            "url": "http://127.0.0.1:8765/video",
+            "url": "http://127.0.0.1:8765/file",
         }
 
 
