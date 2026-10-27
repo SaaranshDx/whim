@@ -8,6 +8,7 @@ from urllib.parse import quote
 
 import webview
 from flask import Flask, abort, request, send_file, send_from_directory
+from werkzeug.serving import make_server
 
 file_path = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else None
 file_name = file_path.name if file_path else "whim"
@@ -22,6 +23,7 @@ window_state_path = Path(
 ) / "whim" / "window.json"
 window_state_lock = threading.Lock()
 app_window = None
+flask_port = None
 DEFAULT_WINDOW_SIZE = (1000, 600)
 IMAGE_EXTENSIONS = {
     ".jpg", ".jpeg", ".jpe", ".jfif", ".pjpeg", ".pjp",
@@ -87,13 +89,18 @@ def serve_file():
     return response
 
 
-def run_server():
-    app.run(
-        host="127.0.0.1",
-        port=8765,
-        debug=False,
-        use_reloader=False,
-    )
+def start_server():
+    global flask_port
+
+    server = make_server("127.0.0.1", 0, app, threaded=True)
+    flask_port = server.server_port
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+
+
+def get_file_url():
+    if flask_port is None:
+        raise RuntimeError("The Flask server has not started")
+    return f"http://127.0.0.1:{flask_port}/file"
 
 
 class Api:
@@ -123,18 +130,18 @@ class Api:
         return {
             "name": file_path.name,
             "path": str(file_path),
-            "url": "http://127.0.0.1:8765/file",
+            "url": get_file_url(),
             "images": image_files,
         }
 
 
 if __name__ == "__main__":
-    threading.Thread(target=run_server, daemon=True).start()
+    start_server()
     api = Api()
     if file_path and file_path.suffix.lower() == ".pdf":
-        file_url = "http://127.0.0.1:8765/file"
+        file_url = get_file_url()
         viewer_url = (
-            "http://127.0.0.1:8765/vendor/pdfjs/web/viewer.html?file="
+            f"http://127.0.0.1:{flask_port}/vendor/pdfjs/web/viewer.html?file="
             + quote(file_url, safe="")
         )
     else:
