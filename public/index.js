@@ -19,4 +19,13 @@ async function init() {
     }
 }
 
+async function getFileMeta() {
+  try {
+    const fileMeta = await window.pywebview.api.get_file_info();
+    return [fileMeta.name, fileMeta.path];
+  } catch (error) {
+    return undefined;
+  }
+}
+
 init();
