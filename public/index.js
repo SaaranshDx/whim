@@ -17,7 +17,12 @@ async function init() {
     const file = await window.pywebview.api.get_file_info();
     if (!file) return;
 
-    if (determineFileType(file.name) !== "video") return;
+    const fileType = determineFileType(file.name);
+    if (fileType === "image") {
+        openImage(file.url, file.name);
+        return;
+    }
+    if (fileType !== "video") return;
 
     const container = document.getElementById("video-container");
     const player = document.getElementById("vid-player");
@@ -39,6 +44,14 @@ async function init() {
     player.play().catch(error => {
         console.warn("Video autoplay was blocked", error);
     });
+}
+
+function openImage(src, fileName) {
+    const container = document.getElementById("image-container");
+    const image = document.getElementById("image-viewer");
+    container.hidden = false;
+    image.alt = fileName;
+    image.src = src;
 }
 
 async function toggleFullscreen() {
@@ -79,6 +92,15 @@ document.addEventListener("keydown", event => {
 
 function determineFileType(fileName) {
     const lowerFileName = fileName.toLowerCase();
+    const imageExtensions = [
+        ".jpg", ".jpeg", ".jpe", ".jfif", ".pjpeg", ".pjp",
+        ".png", ".gif", ".webp", ".avif", ".bmp", ".dib",
+        ".svg", ".svgz", ".ico", ".cur"
+    ];
+    if (imageExtensions.some(extension =>
+        lowerFileName.endsWith(extension)
+    )) return "image";
+
     const videoExtensions = [
         ".mp4", ".m4v", ".mkv", ".webm", ".mov",
         ".avi", ".wmv", ".flv", ".f4v", ".mpeg",
