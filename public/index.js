@@ -21,6 +21,10 @@ async function init() {
     if (!file) return;
 
     const fileType = determineFileType(file.name);
+    if (fileType === "pdf") {
+        openPdf(file.url);
+        return;
+    }
     if (fileType === "image") {
         imageGallery = file.images?.length
             ? file.images
@@ -50,6 +54,13 @@ async function init() {
     player.play().catch(error => {
         console.warn("Video autoplay was blocked", error);
     });
+}
+
+function openPdf(src) {
+    const fileUrl = new URL(src);
+    const viewerUrl = new URL("/vendor/pdfjs/web/viewer.html", fileUrl);
+    viewerUrl.searchParams.set("file", src);
+    window.location.replace(viewerUrl.toString());
 }
 
 function openImage(src, fileName) {
@@ -138,6 +149,8 @@ document.addEventListener("keydown", event => {
 
 function determineFileType(fileName) {
     const lowerFileName = fileName.toLowerCase();
+    if (lowerFileName.endsWith(".pdf")) return "pdf";
+
     const imageExtensions = [
         ".jpg", ".jpeg", ".jpe", ".jfif", ".pjpeg", ".pjp",
         ".png", ".gif", ".webp", ".avif", ".bmp", ".dib",

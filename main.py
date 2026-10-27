@@ -4,7 +4,6 @@ import os
 import sys
 import threading
 from pathlib import Path
-from urllib.parse import quote
 
 import webview
 from flask import Flask, abort, request, send_file, send_from_directory
@@ -136,17 +135,8 @@ class Api:
 
 
 if __name__ == "__main__":
-    start_server()
     api = Api()
-    if file_path and file_path.suffix.lower() == ".pdf":
-        file_url = get_file_url()
-        viewer_url = (
-            f"http://127.0.0.1:{flask_port}/vendor/pdfjs/web/viewer.html?file="
-            + quote(file_url, safe="")
-        )
-    else:
-        viewer_url = str(public_dir / "index.html")
-
+    viewer_url = str(public_dir / "index.html")
     window_width, window_height = load_window_size()
     window = webview.create_window(
         file_name,
@@ -161,4 +151,5 @@ if __name__ == "__main__":
 
     app_window = window
     window.events.resized += save_window_size
+    start_server()
     webview.start()
