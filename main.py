@@ -154,4 +154,4 @@ if __name__ == "__main__":
 
     app_window = window
     window.events.resized += save_window_size
-    webview.start(debug=True)
+    webview.start()
