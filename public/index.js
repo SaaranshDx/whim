@@ -28,4 +28,31 @@ async function getFileMeta() {
   }
 }
 
+
+
+// this is for the future support for other files
+const fileMeta = getFileMeta();
+async function determineFileType(fileMeta) {
+  try {
+    const videoExtensions = [
+        ".mp4", ".m4v", ".mkv", ".webm", ".mov",
+        ".avi", ".wmv", ".flv", ".f4v", ".mpeg",
+        ".mpg", ".m2v", ".m2ts", ".mts", ".ts",
+        ".vob", ".ogv", ".3gp", ".3g2", ".asf",
+        ".rm", ".rmvb", ".divx", ".y4m", ".mxf",
+        ".ivf", ".bik", ".smk", ".amv", ".mjpeg",
+        ".mjpg", ".wtv", ".dvr-ms"
+    ];
+    const fileName = fileMeta[0];
+    const isVideo = videoExtensions.some(ext =>
+        fileName.toLowerCase().endsWith(ext)
+    );
+    if (isVideo) {
+      return `video`;
+    }
+  } catch (error) {
+    return undefined;
+  }
+}
+
 init();
