@@ -7,7 +7,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 import webview
-from flask import Flask, abort, send_file, send_from_directory
+from flask import Flask, abort, request, send_file, send_from_directory
 
 file_path = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else None
 file_name = file_path.name if file_path else "whim"
@@ -20,6 +20,11 @@ window_state_path = Path(
 window_state_lock = threading.Lock()
 app_window = None
 DEFAULT_WINDOW_SIZE = (1000, 600)
+IMAGE_EXTENSIONS = {
+    ".jpg", ".jpeg", ".jpe", ".jfif", ".pjpeg", ".pjp",
+    ".png", ".gif", ".webp", ".avif", ".bmp", ".dib",
+    ".svg", ".svgz", ".ico", ".cur",
+}
 
 
 def load_window_size():
@@ -62,7 +67,19 @@ def serve_file():
     if not file_path or not file_path.is_file():
         abort(404)
 
-    response = send_file(file_path, conditional=True)
+    requested_path = file_path
+    requested_name = request.args.get("name")
+    if requested_name:
+        image_directory = file_path.parent.resolve()
+        requested_path = (image_directory / requested_name).resolve()
+        if (
+            requested_path.parent != image_directory
+            or requested_path.suffix.lower() not in IMAGE_EXTENSIONS
+            or not requested_path.is_file()
+        ):
+            abort(404)
+
+    response = send_file(requested_path, conditional=True)
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
@@ -85,10 +102,26 @@ class Api:
         if not file_path or not file_path.is_file():
             return None
 
+        image_files = []
+        if file_path.suffix.lower() in IMAGE_EXTENSIONS:
+            image_files = [
+                {"name": image.name}
+                for image in sorted(
+                    (
+                        candidate
+                        for candidate in file_path.parent.iterdir()
+                        if candidate.is_file()
+                        and candidate.suffix.lower() in IMAGE_EXTENSIONS
+                    ),
+                    key=lambda candidate: candidate.name.casefold(),
+                )
+            ]
+
         return {
             "name": file_path.name,
             "path": str(file_path),
             "url": "http://127.0.0.1:8765/file",
+            "images": image_files,
         }
 
 

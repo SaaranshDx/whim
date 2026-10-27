@@ -1,5 +1,8 @@
 let isFullscreen = false;
 let handlingNativeFullscreen = false;
+let imageGallery = [];
+let imageBaseUrl = "";
+let currentImageIndex = -1;
 
 async function init() {
     await new Promise(resolve => {
@@ -19,6 +22,9 @@ async function init() {
 
     const fileType = determineFileType(file.name);
     if (fileType === "image") {
+        imageGallery = file.images?.length
+            ? file.images
+            : [{ name: file.name }];
         openImage(file.url, file.name);
         return;
     }
@@ -49,9 +55,31 @@ async function init() {
 function openImage(src, fileName) {
     const container = document.getElementById("image-container");
     const image = document.getElementById("image-viewer");
+    imageBaseUrl = src;
+    currentImageIndex = imageGallery.findIndex(
+        imageFile => imageFile.name === fileName
+    );
+    if (currentImageIndex < 0) currentImageIndex = 0;
+
+    const imageUrl = new URL(imageBaseUrl);
+    imageUrl.searchParams.set("name", fileName);
     container.hidden = false;
     image.alt = fileName;
-    image.src = src;
+    image.src = imageUrl.toString();
+    updateImageNavigation();
+}
+
+function updateImageNavigation() {
+    document.getElementById("image-prev").disabled =
+        currentImageIndex <= 0;
+    document.getElementById("image-next").disabled =
+        currentImageIndex < 0 || currentImageIndex >= imageGallery.length - 1;
+}
+
+function navigateImage(direction) {
+    const nextIndex = currentImageIndex + direction;
+    if (nextIndex < 0 || nextIndex >= imageGallery.length) return;
+    openImage(imageBaseUrl, imageGallery[nextIndex].name);
 }
 
 async function toggleFullscreen() {
@@ -83,7 +111,25 @@ async function handleNativeFullscreenRequest() {
     }
 }
 
+document.getElementById("image-prev").addEventListener(
+    "click",
+    () => navigateImage(-1)
+);
+document.getElementById("image-next").addEventListener(
+    "click",
+    () => navigateImage(1)
+);
+
 document.addEventListener("keydown", event => {
+    if (
+        imageGallery.length > 1
+        && (event.key === "ArrowLeft" || event.key === "ArrowRight")
+    ) {
+        event.preventDefault();
+        navigateImage(event.key === "ArrowLeft" ? -1 : 1);
+        return;
+    }
+
     if (event.key === "F11" || (event.key === "Escape" && isFullscreen)) {
         event.preventDefault();
         toggleFullscreen();

@@ -41,6 +41,50 @@ body {
   user-select: none;
 }
 
+.image-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  width: 32px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid #4a5261;
+  border-radius: 6px;
+  color: #f0f2f5;
+  background: rgb(24 27 34 / 88%);
+  font: 30px/1 sans-serif;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: opacity 120ms ease;
+}
+
+#image-prev {
+  left: 12px;
+}
+
+#image-next {
+  right: 12px;
+}
+
+#image-container:hover .image-nav,
+#image-container:focus-within .image-nav {
+  opacity: 0.85;
+  pointer-events: auto;
+}
+
+.image-nav:hover:not(:disabled),
+.image-nav:focus-visible {
+  background: #323946;
+  opacity: 1;
+}
+
+.image-nav:disabled {
+  cursor: default;
+  opacity: 0.25;
+}
+
 #vid-player {
   display: block;
   width: 100%;
