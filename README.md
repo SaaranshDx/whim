@@ -1,2 +1,3 @@
 # whim
-the best markdown, video, pdf viewer
+
+The most minimalist media viewer(pdf,vids,images) for windows.
