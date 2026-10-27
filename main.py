@@ -30,9 +30,6 @@ def run_server():
 
 
 class Api:
-    def __init__(self):
-        self.window: webview.Window | None = None
-
     def get_file_info(self):
         if not file_path or not file_path.is_file():
             return None
@@ -43,28 +40,6 @@ class Api:
             "url": "http://127.0.0.1:8765/video",
         }
 
-    def resize_for_video(self, width, height):
-        if self.window is None:
-            return
-
-        screen = webview.screens[0]
-
-        max_width = int(screen.width * 0.9)
-        max_height = int(screen.height * 0.85)
-
-        scale = min(
-            max_width / width,
-            max_height / height,
-            1.0
-        )
-
-        window = self.window
-        window.resize(
-            int(width * scale),
-            int(height * scale)
-        )
-
-        window.show()
 
 if __name__ == "__main__":
     threading.Thread(target=run_server, daemon=True).start()
@@ -72,10 +47,11 @@ if __name__ == "__main__":
     window = webview.create_window(
         file_name,
         "public/index.html",
+        width=1000,
+        height=600,
         js_api=api,
     )
     if window is None:
         raise RuntimeError("Failed to create the pywebview window")
 
-    api.window = window
     webview.start(debug=True)

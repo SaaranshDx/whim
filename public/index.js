@@ -30,13 +30,6 @@ async function openVideo() {
     player.src = file.url;
     player.style.display = "block";
 
-    player.onloadedmetadata = async () => {
-        await window.pywebview.api.resize_for_video(
-            player.videoWidth,
-            player.videoHeight
-        );
-    };
-
     player.load();
 }
 
